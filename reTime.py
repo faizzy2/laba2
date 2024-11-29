@@ -7,10 +7,15 @@ class MyTypeError(TypeError):
         super().__init__(f"incorrect type for {var_name}: {type(var)}")
 
 
+class HTTPRequestsError(Exception):
+    def __init__(self, requests_code: int, requests_message: str):
+        super().__init__(f"{requests_code}: {requests_message}")
+
+
 def search_time(text: str) -> list:
     if not isinstance(text, str):
         raise MyTypeError("text", text)
-    pattern_time = r"\b(?:0[0-9]|1[0-9]|2[0-3]):[0-5][0-9]:[0-5][0-9]\b"
+    pattern_time = r"(?:0[0-9]|1[0-9]|2[0-3]):[0-5][0-9]:[0-5][0-9]"
     matched_list = re.findall(pattern_time, text)
 
     return matched_list
@@ -28,9 +33,18 @@ def user_input():
         else:
             print("Incorrect\n")
 
+def url_data(url: str):
+    raw_text = requests.get(url)
+    if raw_text.status_code != 200:
+        raise HTTPRequestsError(raw_text.status_code, raw_text.reason)
+    times = search_time(raw_text.text)
+
+    print("From url: ", times)
+
 def main():
     try:
         user_input()
+        url_data("https://time100.ru")
 
     except Exception as e:
         print("Error: ", e)
