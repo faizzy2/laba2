@@ -15,7 +15,7 @@ class HTTPRequestsError(Exception):
 def search_time(text: str) -> list:
     if not isinstance(text, str):
         raise MyTypeError("text", text)
-    pattern_time = r"(?:0[0-9]|1[0-9]|2[0-3]):[0-5][0-9]:[0-5][0-9]"
+    pattern_time = r"\b(?:0[0-9]|1[0-9]|2[0-3]):[0-5][0-9]:[0-5][0-9]\b"
     matched_list = re.findall(pattern_time, text)
 
     return matched_list
@@ -41,11 +41,19 @@ def url_data(url: str):
 
     print("From url: ", times)
 
+def get_list_from_file(path: str) -> list:
+    if not isinstance(path, str):
+        raise MyTypeError("path", path)
+    with open(path, "r", encoding="utf8") as file:
+        times = file.read()
+        matched_times = search_time(times)
+    return matched_times
+
 def main():
     try:
         user_input()
         url_data("https://time100.ru")
-
+        get_list_from_file("test.txt")
     except Exception as e:
         print("Error: ", e)
 
